@@ -23,12 +23,22 @@ for line in lines:
 
 # Part 1
 
-red_max, green_max, blue_max = 12, 13, 14
+# red_max, green_max, blue_max = 12, 13, 14
+# total = 0
+# for i in range(len(record)):
+#   total += i + 1
+#   for (red, green, blue) in record[i]:
+#     if red > red_max or green > green_max or blue > blue_max:
+#       total -= i + 1
+#       break
+# print(total)
+
+# Part 2
 total = 0
-for i in range(len(record)):
-  total += i + 1
-  for (red, green, blue) in record[i]:
-    if red > red_max or green > green_max or blue > blue_max:
-      total -= i + 1
-      break
+for game in record:
+  red = max([draw[0] for draw in game if draw[0] != -1 ])
+  green = max([draw[1] for draw in game if draw[1] != -1])
+  blue = max([draw[2] for draw in game if draw[2] != -1])
+  total += red * green * blue
 print(total)
+
