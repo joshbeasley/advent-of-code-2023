@@ -21,24 +21,11 @@ for i in range(len(winners)):
       num_winners += 1 
   record[i] = winnings
   num_win.append(num_winners)
-print(sum(record.values()))
-print(num_win)
 
-total = len(winners)
-print(total)
+copies = [1] * len(winners)
+for i, wins in enumerate(num_win):
+  for j in range(i + 1, i + wins + 1):
+    copies[j] += copies[i] 
+print(copies)
+print(sum(copies))
 
-def process_scratchcard(i):
-  if num_win[i] == 0:
-    return 0
-  total = num_win[i]
-  for j in range(i+1, total+1):
-    total += process_scratchcard(j)
-  return total
-
-for i in range(len(num_win)):
-  total += process_scratchcard(i)
-
-print(total)
-
-
-# i = 4, len(record) = 5, num_winner = 3
