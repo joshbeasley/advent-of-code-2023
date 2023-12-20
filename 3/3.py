@@ -1,65 +1,26 @@
 import re
 
-file = open("engine.txt", "r")
-lines = file.readlines()
+grid = open('engine.txt').read().splitlines()
+cs = set()
 
-engine = []
-
-for line in lines:
-  split_line = [*line]
-  if split_line[-1] == '\n':
-    engine.append(split_line[:-1])
-  else:
-    engine.append(split_line)
-
-locations = {}
-parts = set()
-
-for i in range(len(lines)):
-  split_line = re.split(r'\D+', lines[i])
-  for c in split_line:
-    if c.isdigit():
-      occurences = [i.start() for i in re.finditer(c, lines[i])]
-      final_idx = occurences[0]
-      for idx in occurences:
-        if (i, idx) in locations:
+for r, row in enumerate(grid):
+  for c, ch in enumerate(row):
+    if ch.isdigit() or ch == '.':
+      continue
+    for cr in [r - 1, r, r + 1]:
+      for cc in [c - 1, c, c + 1]:
+        if cr < 0 or cr >= len(grid) or cc < 0 or cc >= len(grid[cr]) or not grid[cr][cc].isdigit():
           continue
-        else:
-          final_idx = idx
-          break
-      for j in range(len(c)):
-        locations[(i, final_idx + j)] = int(c)
-      parts.add(int(c))
+        while cc > 0 and grid[cr][cc - 1].isdigit():
+          cc -= 1
+        cs.add((cr, cc))
 
-total = 0
+ns = []
+for r, c in cs:
+  num = ''
+  while c < len(grid[r]) and grid[r][c].isdigit():
+    num += grid[r][c]
+    c += 1
+  ns.append(int(num))
 
-for i in range(len(engine)):
-  for j in range(len(engine[0])):
-    if not engine[i][j].isdigit() and engine[i][j] != '.':
-      if i+1 < len(engine) and engine[i+1][j].isdigit() and locations[(i+1,j)] in parts:
-        total += locations[(i+1,j)]
-        parts.remove(locations[(i+1,j)])
-      if i+1 < len(engine) and j+1 < len(engine[0]) and engine[i+1][j+1].isdigit() and locations[(i+1,j+1)] in parts:
-        total += locations[(i+1,j+1)]
-        parts.remove(locations[(i+1,j+1)])
-      if i+1 < len(engine) and j-1 >= 0 and engine[i+1][j-1].isdigit() and locations[(i+1,j-1)] in parts:
-        total += locations[(i+1,j-1)]
-        parts.remove(locations[(i+1,j-1)])
-      if j+1 < len(engine[0]) and engine[i][j+1].isdigit() and locations[(i,j+1)] in parts:
-        total += locations[(i,j+1)]
-        parts.remove(locations[(i,j+1)])
-      if j+1 < len(engine[0]) and i-1 >= 0 and engine[i-1][j+1].isdigit() and locations[(i-1,j+1)] in parts:
-        total += locations[(i-1,j+1)]
-        parts.remove(locations[(i-1,j+1)])
-      if j-1 >= 0 and engine[i][j-1].isdigit() and locations[(i,j-1)] in parts:
-        total += locations[(i,j-1)]
-        parts.remove(locations[(i,j-1)])
-      if j-1 >= 0 and i-1 >= 0 and engine[i-1][j-1].isdigit() and locations[(i-1,j-1)] in parts:
-        total += locations[(i-1,j-1)]
-        parts.remove(locations[(i-1,j-1)])
-      if i-1 >= 0 and engine[i-1][j].isdigit() and locations[(i-1,j)] in parts:
-        total += locations[(i-1,j)]
-        parts.remove(locations[(i-1,j)])
-print(total)
-      
-
+print(sum(ns))
