@@ -50,23 +50,27 @@ new_seeds = []
 for i in range(0, len(seeds) - 1, 2):
   new_seeds.append((seeds[i], seeds[i] + seeds[i+1]))
 
-seeds = []
-for start, end in new_seeds:
-  seeds += [i for i in range(start, end)]
-print(seeds)
+seeds = new_seeds
 
 for block in blocks:
   ranges = []
   for line in block.splitlines()[1:]:
     ranges.append(list(map(int, line.split())))
   locations = []
-  for seed in seeds:
+  while len(seeds) > 0:
+    s, e = seeds.pop()
     for a, b, c in ranges:
-      if seed >= b and seed < b + c:
-        locations.append(seed - b + a)
+      os = max(s, b)
+      oe = min(e, b + c)
+      if os < oe:
+        locations.append((os - b + a, oe - b + a))
+        if os > s:
+          seeds.append((s, os))
+        if e > oe:
+          seeds.append((oe, e))
         break
     else:
-      locations.append(seed)
+      locations.append((s, e))
   seeds = locations
 
-print(min(locations))
+print(min(locations)[0])
