@@ -1,3 +1,5 @@
+import numpy as np
+
 file = open('maze.txt').read().splitlines()
 
 grid = []
@@ -45,4 +47,56 @@ while len(queue) > 0:
             depth[neighbor] = depth[curr] + 1
             
 print(max(depth.values()))
+
+# Part 2
+
+# Attempt 1: Shoelace and Pick's
+# Pick's Thereom: i = A - (b/2) - 1 where b = length of loop and A = area
+# Shoelace Formula: 2A = |x1 x2 x3 ... xn x1|      
+#                        |y1 y2 y3 ... yn y1|
+
+keys = list(depth.keys())
+points = []
+points.append(keys.pop(0))
+left = True
+while len(keys) > 0:
+    if left:
+        points.insert(0, keys.pop(0))
+    else:
+        points.append(keys.pop(0))
+    left = not left
+points.reverse()
+
+x = []
+y = []
+for i, j in points:
+    x += [i, i]
+    y += [j, j]
+
+x = x[1:] + [x[0]]
+y = y[1:] + [y[0]]
+
+squares = []
+for i in range(0, len(x), 2):
+    square = []
+    square.append([x[i], x[i+1]])
+    square.append([y[i], y[i+1]])
+    squares.append(square)
+    
+area = np.sum(np.linalg.det(np.array(squares))) / 2
+b = len(depth.keys())
+i = area - (b/2) - 1
+
+# Must be messing up the math here, going to try a more naive method
+
+# Attempt 2: Vertical Bar Parity
+inside = 0
+for i in range(len(grid)):
+    bars = 0
+    for j in range(len(grid[0])):
+        if grid[i][j] == '.' and bars % 2 == 1:
+            inside += 1
+        if (i, j) in depth and grid[i][j] in '|JL':
+            bars += 1
+print(inside)
 
