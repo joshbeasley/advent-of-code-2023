@@ -1,52 +1,63 @@
 grid = open('grid.txt').read().splitlines()
 
-seen = set()
-q = []
 
-# iterative approach
-initial = (0, -1, 0, 1)
-q.append(initial)
-seen.add(initial)
+def sim(r, c, dr, dc):
+    seen = set()
+    q = []
 
-while len(q) > 0:
-    r, c, dr, dc = q.pop(0)
-    
-    r += dr
-    c += dc
-    
-    if r < 0 or r >= len(grid) or c < 0 or c >= len(grid[0]):
-        continue
-    
-    val = grid[r][c]
-    
-    if val == '.' or (val == '-' and dc != 0) or (val == '|' and dr != 0):
-        if (r,c,dr,dc) not in seen:
-            q.append((r,c,dr,dc))
-            seen.add((r,c,dr,dc))
-    elif val == '\\':
-        dr, dc = dc, dr
-        if (r,c,dr,dc) not in seen:
-            q.append((r,c,dr,dc))
-            seen.add((r,c,dr,dc))
-    elif val == '/':
-        dr, dc = -dc, -dr
-        if (r,c,dr,dc) not in seen:
-            q.append((r,c,dr,dc))
-            seen.add((r,c,dr,dc))
-    else:
-        if val == '|':
-            for dr, dc in [(1, 0), (-1, 0)]:
-                if (r,c,dr,dc) not in seen:
-                    q.append((r,c,dr,dc))
-                    seen.add((r,c,dr,dc))   
+    # iterative approach
+    initial = (r, c, dr, dc)
+    q.append(initial)
+
+    while len(q) > 0:
+        r, c, dr, dc = q.pop(0)
+        
+        r += dr
+        c += dc
+        
+        if r < 0 or r >= len(grid) or c < 0 or c >= len(grid[0]):
+            continue
+        
+        val = grid[r][c]
+        
+        if val == '.' or (val == '-' and dc != 0) or (val == '|' and dr != 0):
+            if (r,c,dr,dc) not in seen:
+                q.append((r,c,dr,dc))
+                seen.add((r,c,dr,dc))
+        elif val == '\\':
+            dr, dc = dc, dr
+            if (r,c,dr,dc) not in seen:
+                q.append((r,c,dr,dc))
+                seen.add((r,c,dr,dc))
+        elif val == '/':
+            dr, dc = -dc, -dr
+            if (r,c,dr,dc) not in seen:
+                q.append((r,c,dr,dc))
+                seen.add((r,c,dr,dc))
         else:
-            for dr, dc in [(0, 1), (0, -1)]:
-                if (r,c,dr,dc) not in seen:
-                    q.append((r,c,dr,dc))
-                    seen.add((r,c,dr,dc)) 
+            if val == '|':
+                for dr, dc in [(1, 0), (-1, 0)]:
+                    if (r,c,dr,dc) not in seen:
+                        q.append((r,c,dr,dc))
+                        seen.add((r,c,dr,dc))   
+            else:
+                for dr, dc in [(0, 1), (0, -1)]:
+                    if (r,c,dr,dc) not in seen:
+                        q.append((r,c,dr,dc))
+                        seen.add((r,c,dr,dc)) 
 
-print(len(set([(i[0], i[1]) for i in seen])) - 1)
+    return len(set([(i[0], i[1]) for i in seen]))
+
+max_val = 0
+for i in range(len(grid)):
+    max_val = max(max_val, sim(i, -1, 0, 1))
+    max_val = max(max_val, sim(i, len(grid[0]), 0, -1))
+
+for i in range(len(grid[0])):
+    max_val = max(max_val, sim(-1, i, 1, 0))
+    max_val = max(max_val, sim(len(grid), i, -1, 0))
     
+print(max_val)
 
 # recursive approach
 def energized(r, c, direction):
